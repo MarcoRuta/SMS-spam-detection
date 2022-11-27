@@ -1,19 +1,15 @@
+# importing all the needed packages
 import numpy as np
 import nltk.corpus 
 from utility import data_preprocessing 
 from utility import train_and_test
 from utility import stemmer
 
+# downloading a set of worlds from nltk
 nltk.download('words')
 
+# retrieving the training and testing sets
 X,Y,X_train,X_test,y_train,y_test = data_preprocessing.split_train_test_SMS(0)
-
-# saving the labels and the bodies of the messages in two different files
-np.savetxt('dataset/body.txt', X.values, fmt='%s')
-np.savetxt('dataset/labels.txt', Y.values, fmt='%s')
-
-bodies_file = 'dataset/body.txt'
-labels_file = 'labels.txt'
 
 # set of the spam words
 spam_words = set()
@@ -30,32 +26,24 @@ for text,label in zip(X_train,y_train):
     else: 
         ham_words.update(stems)
 
-# building the blacklist
+# building the blacklist as difference between spam and ham words set
 blacklist = spam_words - ham_words
 print('\nblacklist of {} tokens successfully built!\n'.format(len(blacklist)))
+
+# saving the blacklist
+with open('dataset/blacklist.txt','w') as f:
+    f.write(str(blacklist))
 
 # evaluating the blacklist
 train_and_test.evaluate_blacklist(X_test,y_test,blacklist)
 
-# removing all the strange strings from the blacklist
-word_set = set(nltk.corpus.words.words())
-blacklist = word_set.intersection(blacklist)
+# keeping only meaningful words in the blacklist via an intersection with kltk words set
+blacklist = set(nltk.corpus.words.words()).intersection(blacklist)
 print('\nThe blacklist was cleaned from strange strings, now is made of {} tokens\n'.format(len(blacklist)))
+
+#saving the new blacklist
+with open('dataset/cleaned_blacklist.txt','w') as f:
+    f.write(str(blacklist))
 
 # evaluating the blackist
 train_and_test.evaluate_blacklist(X_test,y_test,blacklist)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
