@@ -1,0 +1,11 @@
+numpy
+nltk
+nltk
+datasketch
+prettytable
+sklearn
+pandas
+matplotlib
+wordcloud
+string
+termcolor
