@@ -3,11 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
-
+from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 
 # This function load the dataset, converts the categorical labels, splits (with stratification) training and testing set and return the two subsets
-def split_train_test_SMS(print):
-    
+def split_train_test_SMS(show):
+
     # reading the csv file into a pandas dataframe
     db = pd.read_csv (r'dataset/spam.csv',encoding='latin-1')
 
@@ -18,10 +18,15 @@ def split_train_test_SMS(print):
     Y = db['v1']
     X = db['v2']
 
+    # dropping the three unused features (they mostly have null values)
+    #print(db.isnull().sum())
+    db.drop(labels=['Unnamed: 2','Unnamed: 3','Unnamed: 4'],axis=1,inplace=True)
+    
+
     # split testing and training set (70/30) with stratification on the label
     X_train, X_test, y_train, y_test = train_test_split(X,Y,stratify = Y, test_size = 0.3)
 
-    if(print):
+    if(show):
 
         # plotting with histograms which is the distribution of spam/ham messages in the orginal dataset, training test, and testing set
         # this plot gives us a good visualization of the different dataset distribution (the rateo is preserved by stratificated splitting)
@@ -45,6 +50,3 @@ def split_train_test_SMS(print):
         plt.show()
 
     return X,Y,X_train,X_test,y_train,y_test
-
-
-
