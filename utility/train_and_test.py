@@ -14,19 +14,19 @@ from datasketch import MinHash, MinHashLSH
 
 # Classifiers that will be used
 classifiers = [
-    #LogisticRegression( max_iter=500, solver="lbfgs" ),
-    #DecisionTreeClassifier(max_depth = 5),
-    #KNeighborsClassifier( 3 ),
-    #SVC(),
+    LogisticRegression( max_iter=500, solver="lbfgs" ),
+    DecisionTreeClassifier(max_depth = 5),
+    KNeighborsClassifier( 3 ),
+    SVC(),
     MultinomialNB()
 ]
 
 # Names of the classifiers
 names = [
-    #'Logistic Regression',
-    #'Decision Tree',
-    #'KNeighbors',
-    #'SVC',
+    'Logistic Regression',
+    'Decision Tree',
+    'KNeighbors',
+    'SVC',
     'Naive Bayes'
 ]
 
