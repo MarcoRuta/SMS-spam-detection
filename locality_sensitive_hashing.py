@@ -12,7 +12,7 @@ X,Y,X_train,X_test,y_train,y_test = data_preprocessing.split_train_test_SMS(0)
 spam_messages = []
 
 # grouping up all the spam messages
-for text,label in zip(X_test,y_test):
+for text,label in zip(X_train,y_train):
     if(label):
         spam_messages.append(text)
 
