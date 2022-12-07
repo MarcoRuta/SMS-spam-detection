@@ -2,9 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split
-from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
-import data_preprocessing
+from wordcloud import WordCloud, STOPWORDS
 
 # reading the csv file into a pandas dataframe
 db = pd.read_csv (r'dataset/spam.csv',encoding='latin-1')
@@ -16,19 +14,42 @@ db[['v1']] = db[['v1']].apply(LabelEncoder().fit_transform)
 Y = db['v1']
 X = db['v2']
 
+# print in the shell some general info about the dataset
+def print_info():
+    print("Head of the dataset: ")
+    print(db.head())
+    print("Shape of the dataset: ")
+    db.shape
+    print("Number of null instances in the dataset: "+str(db.isnull().sum))
+
 # plot a cloudwords with the most frequent words in the spam messages
 def cloud_words():
         spam_messages = db[Y==1]['v2']
-        print(spam_messages)
 
         words = ""
 
         for message in spam_messages:
-            words = words + str(message)
+            words += message
+
+        wordcloud = WordCloud(width=800, height=400, max_font_size=100, max_words=50,colormap='summer').generate(words)
+        plt.figure()
+        plt.imshow(wordcloud, interpolation="bilinear")
+        plt.axis("off")
+        plt.show()
+
+# plot a cloudwords with the most frequent words in the spam messages
+def cloud_words_stemmed():
+        spam_messages = db[Y==1]['v2']
+
+        words = ""
+
+        for message in spam_messages:
+            
+            words += message
 
         stop = set(STOPWORDS)
-        stop.update(["a","u","U"])
-        wordcloud = WordCloud(max_font_size=100, max_words=50,colormap='summer',stopwords=stop).generate(words)
+
+        wordcloud = WordCloud(width=800, height=400, max_font_size=100,normalize_plurals=True,min_word_length=3, max_words=50,colormap='summer',stopwords=stop).generate(words)
         plt.figure()
         plt.imshow(wordcloud, interpolation="bilinear")
         plt.axis("off")
@@ -70,3 +91,4 @@ if __name__ == '__main__':
     print_info()
     print_sms_lenght()
     cloud_words()
+    cloud_words_stemmed()
