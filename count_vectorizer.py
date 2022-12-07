@@ -43,8 +43,9 @@ def classify(train_x, train_y, test_x, test_y):
         _matrix = confusion_matrix(test_y,predictions)
 
         # saving the trained algorithm in the trained_models directory
-        filename = 'trained_models/'+name+'.sav'
-        pickle.dump(clf, open(filename, 'wb'))
+        model = 'trained_models/'+name+'.model'
+        pickle.dump(clf, open(model, 'wb'))
+
 
         t.add_row(
             [colored( name, 'blue' ), _matrix, _accuracy[0:5], _precision[0:5], _recall[0:5], _f1[0:5] 
@@ -103,6 +104,10 @@ for vectorizer,features in zip(count_vectorizers, vectorizer_features):
 
     # transformin also the full dataset for k-cross validation
     full_data = vectorizer.transform(X)
+
+    # saving the trained vectorizer in the trained_models directory
+    cv = 'trained_models/vectorizer.pickle'
+    pickle.dump(vectorizer, open(cv, 'wb'))
 
     # classify with 70 % training and 30% testing
     print("\n\n"+"*"*60+"\nResults for vectorizer: "+features+"\n"+"*"*60+"\n\n")
