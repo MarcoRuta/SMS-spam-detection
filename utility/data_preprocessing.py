@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
-from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 
 # This function load the dataset, converts the categorical labels, splits (with stratification) training and testing set and return the two subsets
 def split_train_test_SMS(show):

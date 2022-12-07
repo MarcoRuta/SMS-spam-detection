@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 from wordcloud import WordCloud, STOPWORDS
+import data_preprocessing
 
 # reading the csv file into a pandas dataframe
 db = pd.read_csv (r'dataset/spam.csv',encoding='latin-1')
@@ -89,6 +90,7 @@ def print_sms_lenght():
 
 if __name__ == '__main__':
     print_info()
+    data_preprocessing.split_train_test_SMS(1)
     print_sms_lenght()
     cloud_words()
     cloud_words_stemmed()
