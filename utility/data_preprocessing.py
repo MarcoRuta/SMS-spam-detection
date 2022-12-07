@@ -18,7 +18,7 @@ def split_train_test_SMS(show):
     X = db['v2']
 
     # dropping the three unused features (they mostly have null values)
-    #print(db.isnull().sum())
+    print(db.isnull().sum())
     db.drop(labels=['Unnamed: 2','Unnamed: 3','Unnamed: 4'],axis=1,inplace=True)
     
 
