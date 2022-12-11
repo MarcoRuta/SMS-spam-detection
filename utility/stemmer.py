@@ -6,7 +6,7 @@ nltk.download('punkt')
 
 punctuations = list(string.punctuation)
 stopwords = set(nltk.corpus.stopwords.words('english'))
-stemmer = nltk.PorterStemmer()
+stemmer = nltk.SnowballStemmer('english')
 
 def stem(text):
     if not text:

@@ -4,9 +4,15 @@ import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import CountVectorizer
 from wordcloud import WordCloud, STOPWORDS
 import data_cleaning
+import stemmer
 
 # retrieving the data needed (cleaned)
 db,X,Y,X_train,X_test,y_train,y_test = data_cleaning.get_data()
+
+def stemmer_test():
+    print(db.sms.values[53])
+    print(stemmer.stem(db.sms.values[53])) 
+
 
 # plotting with histograms which is the distribution of spam/ham messages in the orginal dataset, training test, and testing set
 # this plot gives us a good visualization of the different dataset distribution (the rateo is preserved by stratificated splitting)
@@ -128,6 +134,7 @@ def print_top_words():
 
 
 if __name__ == '__main__':
+    stemmer_test()
     data_distribution()
     cloud_words()
     cloud_words_stemmed()
