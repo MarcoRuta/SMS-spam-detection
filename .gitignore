@@ -1,4 +1,5 @@
 **/*.pyc
 **/*.txt
 flagged/
+trained_models/
 
