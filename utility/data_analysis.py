@@ -1,31 +1,45 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import LabelEncoder
+from sklearn.feature_extraction.text import CountVectorizer
 from wordcloud import WordCloud, STOPWORDS
-import data_preprocessing
+import data_cleaning
 
-# reading the csv file into a pandas dataframe
-db = pd.read_csv (r'dataset/spam.csv',encoding='latin-1')
+# retrieving the data needed (cleaned)
+db,X,Y,X_train,X_test,y_train,y_test = data_cleaning.get_data()
 
-# convert the categorical labels of v1 (ham,spam) in binary (0,1) labels
-db[['v1']] = db[['v1']].apply(LabelEncoder().fit_transform)
+# plotting with histograms which is the distribution of spam/ham messages in the orginal dataset, training test, and testing set
+# this plot gives us a good visualization of the different dataset distribution (the rateo is preserved by stratificated splitting)
+def data_distribution():
 
-# labels and features raw arrays
-Y = db['v1']
-X = db['v2']
+        figure, axis = plt.subplots(1, 3)
+        
+        axis[0].set_facecolor('silver')
+        axis[0].hist(Y, bins=[0,0.5,1], color='b', rwidth=0.7)
+        axis[0].set_xlabel("target value")
+        axis[0].set_ylabel("number of instances")
+        axis[0].set_title("Dataset distribution")
+        axis[0].set_xticks(np.arange(0, 2, 1))
+        
+        axis[1].set_facecolor('silver')
+        axis[1].hist(y_train, bins=[0,0.5,1], color ='g', rwidth=0.7)
+        axis[1].set_xlabel("target value")
+        axis[1].set_ylabel("number of instances")
+        axis[1].set_title("Training set distribution")
+        axis[1].set_xticks(np.arange(0, 2, 1))
 
-# print in the shell some general info about the dataset
-def print_info():
-    print("Head of the dataset: ")
-    print(db.head())
-    print("Shape of the dataset: ")
-    db.shape
-    print("Number of null instances in the dataset: "+str(db.isnull().sum))
+        axis[2].set_facecolor('silver')
+        axis[2].hist(y_test, bins=[0,0.5,1], color= 'r', rwidth=0.7)
+        axis[2].set_xlabel("target value")
+        axis[2].set_ylabel("number of instances")
+        axis[2].set_title("Testing set distribution")
+        axis[2].set_xticks(np.arange(0, 2, 1))
+
+        plt.show()
 
 # plot a cloudwords with the most frequent words in the spam messages
 def cloud_words():
-        spam_messages = db[Y==1]['v2']
+        spam_messages = db[Y==1]['sms']
 
         words = ""
 
@@ -40,7 +54,7 @@ def cloud_words():
 
 # plot a cloudwords with the most frequent words in the spam messages
 def cloud_words_stemmed():
-        spam_messages = db[Y==1]['v2']
+        spam_messages = db[Y==1]['sms']
 
         words = ""
 
@@ -56,41 +70,65 @@ def cloud_words_stemmed():
         plt.axis("off")
         plt.show()
 
-# print in the shell some general info about the dataset
-def print_info():
-    print("Head of the dataset: ")
-    print(db.head())
-    print("Shape of the dataset: ")
-    db.shape
-    print("Number of null instances in the dataset: "+str(db.isnull().sum))
+#return the top 20 words with their frequency 
+def top_n_words(corpus, n):
+    vec = CountVectorizer().fit(corpus)
+    bag_of_words = vec.transform(corpus)
+    sum_words = bag_of_words.sum(axis=0) 
+    words_freq = [(word, sum_words[0, idx]) for word, idx in vec.vocabulary_.items()]
+    words_freq =sorted(words_freq, key = lambda x: x[1], reverse=True)
+    return words_freq[:n]
 
-# print a bar chart that shows the number of words distribution in the dataset
-def print_sms_lenght():
+#return the top 20 words with their frequency (without stopwords) 
+def top_n_words_stopwords(corpus, n):
+    vec = CountVectorizer(stop_words = 'english').fit(corpus)
+    bag_of_words = vec.transform(corpus)
+    sum_words = bag_of_words.sum(axis=0) 
+    words_freq = [(word, sum_words[0, idx]) for word, idx in vec.vocabulary_.items()]
+    words_freq =sorted(words_freq, key = lambda x: x[1], reverse=True)
+    return words_freq[:n]
 
-    # adding a feature with the number of word in each message
-    db['Count']=0
-    for i in np.arange(0,len(db.v2)):
-        db.loc[i,'Count'] = len(db.loc[i,'v2'])
+def print_top_words():
 
-    # counting up and sort the number of word for ham messages
-    ham  = db[Y == 0]
-    ham_count  = pd.DataFrame(pd.value_counts(ham['Count'],sort=True).sort_index())
+    figure, axis = plt.subplots(2)
 
-    # counting up and sort the number of word for spam messages
-    spam = db[Y == 1]
-    spam_count = pd.DataFrame(pd.value_counts(spam['Count'],sort=True).sort_index())
+    common_words = top_n_words(X, 20)
+    df1 = pd.DataFrame(common_words, columns = ['sms_words' , 'count'])
+    df1.groupby('sms_words').sum()['count'].sort_values(ascending=False)
+    axis[0].bar(x=df1['sms_words'],height=df1['count'])
+    axis[0].set_title('Frequency of words in all the sms')
 
-    # plotting the bar chart
-    fig, ax = plt.subplots(figsize=(17,5))
-    spam_count['Count'].value_counts().sort_index().plot(ax=ax, kind='bar',facecolor='red',label = "spam")
-    ham_count['Count'].value_counts().sort_index().plot(ax=ax, kind='bar',facecolor='green',label = "ham")
-    plt.suptitle("Distribution of number of words in the messages")
-    plt.legend(loc="upper right")
+
+    common_words = top_n_words_stopwords(X, 20)
+    df1 = pd.DataFrame(common_words, columns = ['sms_words' , 'count'])
+    df1.groupby('sms_words').sum()['count'].sort_values(ascending=False)
+    axis[1].bar(x=df1['sms_words'],height=df1['count'])
+    axis[1].set_title('Frequency of words in all the sms (without stopwords)')
+
     plt.show()
 
+    figure, axis = plt.subplots(2)
+
+    spam_messages = db[Y==1]['sms']
+
+    common_words = top_n_words(spam_messages, 20)
+    df1 = pd.DataFrame(common_words, columns = ['sms_words' , 'count'])
+    df1.groupby('sms_words').sum()['count'].sort_values(ascending=False)
+    axis[0].bar(x=df1['sms_words'],height=df1['count'],color = 'red')
+    axis[0].set_title('Frequency of words in the spam messages')
+
+
+    common_words = top_n_words_stopwords(spam_messages, 20)
+    df1 = pd.DataFrame(common_words, columns = ['sms_words' , 'count'])
+    df1.groupby('sms_words').sum()['count'].sort_values(ascending=False)
+    axis[1].bar(x=df1['sms_words'],height=df1['count'],color = 'red')
+    axis[1].set_title('Frequency of words in the spam messages (without stopwords)')
+
+    plt.show()
+
+
 if __name__ == '__main__':
-    print_info()
-    data_preprocessing.split_train_test_SMS(1)
-    print_sms_lenght()
+    data_distribution()
     cloud_words()
     cloud_words_stemmed()
+    print_top_words()
