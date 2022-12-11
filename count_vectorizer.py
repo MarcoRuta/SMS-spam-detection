@@ -3,7 +3,8 @@ from utility import data_cleaning
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import roc_curve, auc, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 from sklearn.linear_model import SGDClassifier
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.svm import SVC
+from sklearn.naive_bayes import MultinomialNB,GaussianNB,ComplementNB
 from prettytable import PrettyTable
 from sklearn.model_selection import cross_val_score, cross_val_predict, StratifiedKFold
 from termcolor import colored
@@ -15,14 +16,18 @@ db,X,Y,X_train,X_test,y_train,y_test = data_cleaning.get_data()
 
 # Classifiers that will be used
 classifiers = [
+    SVC(),
     SGDClassifier(),
+    ComplementNB(),
     MultinomialNB()
 ]
 
 # Names of the classifiers
 names = [
+    'SVC',
     'SGD SVM',
-    'Naive Bayes'
+    'Complement Naive Bayes',
+    'Multinomial Naive Bayes'
 ]
 
 # Function that train and test all the classifiers chosen and return the results
