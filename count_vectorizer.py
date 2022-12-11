@@ -1,14 +1,17 @@
 # importing all the needed packages
-from utility import data_preprocessing 
+from utility import data_cleaning 
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+from sklearn.metrics import roc_curve, auc, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 from sklearn.linear_model import SGDClassifier
 from sklearn.naive_bayes import MultinomialNB
 from prettytable import PrettyTable
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, cross_val_predict, StratifiedKFold
 from termcolor import colored
 import pickle
+import matplotlib.pyplot as plt
 
+# retrieving the data needed (cleaned)
+db,X,Y,X_train,X_test,y_train,y_test = data_cleaning.get_data()
 
 # Classifiers that will be used
 classifiers = [
@@ -42,6 +45,20 @@ def classify(train_x, train_y, test_x, test_y):
         _f1 = format(f1_score(test_y,predictions))
         _matrix = confusion_matrix(test_y,predictions)
 
+        fpr, tpr, _ = roc_curve( test_y, predictions )
+        roc_auc = auc( fpr, tpr )
+        plt.figure()
+        lw = 2
+        plt.plot( fpr, tpr, color='darkturquoise', lw=lw, label='ROC curve (area = %0.2f)' % roc_auc )
+        plt.plot( [0, 1], [0, 1], color='navy', lw=lw, linestyle='--' )
+        plt.xlim( [0.0, 1.0] )
+        plt.ylim( [0.0, 1.05] )
+        plt.xlabel( 'False Positive Rate' )
+        plt.ylabel( 'True Positive Rate' )
+        plt.title( name+' ROC curve' )
+        plt.legend( loc="lower right" )
+        plt.show()
+
         # saving the trained algorithm in the trained_models directory
         model = 'trained_models/'+name+'.model'
         pickle.dump(clf, open(model, 'wb'))
@@ -60,25 +77,27 @@ def classify(train_x, train_y, test_x, test_y):
 def k_fold_cross_validation(x,y,k):
 
     t = PrettyTable(
-        ['Name', ' AVG Accuracy', 'AVG Precision', 'AVG Recall', 'AVG F1'] )
+        ['Confusion Matrix', 'Name', ' AVG Accuracy', 'AVG Precision', 'AVG Recall', 'AVG F1'] )
+
+    skf = StratifiedKFold(n_splits=k)
 
     for name, clf in zip( names, classifiers ):
 
-        _avg_accuracy = cross_val_score( clf, x, y, cv=k, scoring='accuracy' )
-        _avg_precision = cross_val_score( clf, x, y, cv=k, scoring='precision_macro' )
-        _avg_recall = cross_val_score( clf, x, y, cv=k, scoring='recall_macro' )
-        _avg_F1 = cross_val_score( clf, x, y, cv=k, scoring='f1_macro' )
+        _avg_accuracy = cross_val_score( clf, x, y, cv=skf, scoring='accuracy' )
+        _avg_precision = cross_val_score( clf, x, y, cv=skf, scoring='precision_macro' )
+        _avg_recall = cross_val_score( clf, x, y, cv=skf, scoring='recall_macro' )
+        _avg_F1 = cross_val_score( clf, x, y, cv=skf, scoring='f1_macro' )
+
+        predictions = cross_val_predict( clf, x, y, cv=skf )
+        matrix = confusion_matrix( y, predictions )
 
         t.add_row(
-            [colored( name, 'blue' ), round(_avg_accuracy.mean(),3), round(_avg_precision.mean(), 3), round(_avg_recall.mean(), 3), round(_avg_F1.mean(), 3)
+            [matrix,colored( name, 'blue' ), round(_avg_accuracy.mean(),3), round(_avg_precision.mean(), 3), round(_avg_recall.mean(), 3), round(_avg_F1.mean(), 3)
             ])
 
-        t.add_row( ['', '', '', '', ''] )
+        t.add_row( ['','', '', '', '', ''] )
     print(t)
-    return
 
-# param 1 if you want to see a graphical representation of the dataset, 0 otherwise
-X,Y,X_train,X_test,y_train,y_test = data_preprocessing .split_train_test_SMS(0)
 
 # trying several count_vectorizer the best results are with the last one
 count_vectorizers = [
@@ -115,4 +134,4 @@ for vectorizer,features in zip(count_vectorizers, vectorizer_features):
 
 # classify with k-cross fold validation (k = 10)
 full_data = count_vectorizers[-1].transform(X)
-k_fold_cross_validation(full_data,Y,8)
+k_fold_cross_validation(full_data,Y,10)
