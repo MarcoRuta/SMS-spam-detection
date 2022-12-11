@@ -1,8 +1,11 @@
 # importing all the needed packages
 from datasketch import MinHash, MinHashLSH
 from prettytable import PrettyTable
-from utility import data_preprocessing 
+from utility import data_cleaning 
 from utility import stemmer
+
+# retrieving the data needed (cleaned)
+db,X,Y,X_train,X_test,y_train,y_test = data_cleaning.get_data()
 
 # Function that evaluate the metrics of a given lsh on a given testing set
 def lsh_classify(X_test,y_test,lsh):
@@ -62,9 +65,6 @@ def lsh_classify(X_test,y_test,lsh):
 
     t.add_row( ['', '', '', '', ''] )
     print( t )
-
-# retrieving the training and testing sets
-X,Y,X_train,X_test,y_train,y_test = data_preprocessing.split_train_test_SMS(0)
 
 # spam messages list
 spam_messages = []

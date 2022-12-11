@@ -1,9 +1,12 @@
 # importing all the needed packages
 import numpy as np
 import nltk.corpus 
-from utility import data_preprocessing 
+from utility import data_cleaning 
 from utility import stemmer
 from prettytable import PrettyTable
+
+# retrieving the data needed (cleaned)
+db,X,Y,X_train,X_test,y_train,y_test = data_cleaning.get_data()
 
 # Function that evaluate the metrics of a given blacklist over a given testing set
 def evaluate_blacklist(X_test,y_test,blacklist):
@@ -49,9 +52,6 @@ def evaluate_blacklist(X_test,y_test,blacklist):
 
 # downloading a set of worlds from nltk
 nltk.download('words')
-
-# retrieving the training and testing sets
-X,Y,X_train,X_test,y_train,y_test = data_preprocessing.split_train_test_SMS(0)
 
 # set of the spam words
 spam_words = set()
