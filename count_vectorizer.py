@@ -77,7 +77,7 @@ def classify(train_x, train_y, test_x, test_y):
 def k_fold_cross_validation(x,y,k):
 
     t = PrettyTable(
-        ['Confusion Matrix', 'Name', ' AVG Accuracy', 'AVG Precision', 'AVG Recall', 'AVG F1'] )
+        [ 'Name', 'Confusion Matrix', ' AVG Accuracy', 'AVG Precision', 'AVG Recall', 'AVG F1'] )
 
     skf = StratifiedKFold(n_splits=k)
 
@@ -92,7 +92,7 @@ def k_fold_cross_validation(x,y,k):
         matrix = confusion_matrix( y, predictions )
 
         t.add_row(
-            [matrix,colored( name, 'blue' ), round(_avg_accuracy.mean(),3), round(_avg_precision.mean(), 3), round(_avg_recall.mean(), 3), round(_avg_F1.mean(), 3)
+            [colored( name, 'blue' ), matrix, round(_avg_accuracy.mean(),3), round(_avg_precision.mean(), 3), round(_avg_recall.mean(), 3), round(_avg_F1.mean(), 3)
             ])
 
         t.add_row( ['','', '', '', '', ''] )
