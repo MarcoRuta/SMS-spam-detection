@@ -15,7 +15,7 @@ def evaluate_blacklist(X_test,y_test,blacklist):
     fp = 0
     fn = 0
 
-    for text,label in zip(X_test,y_test):
+    for text,label in zip(X_test['sms'],y_test):
         stems = set(text.split())
         stems_set = set(stems)
         # email's words are in blacklist
@@ -58,7 +58,7 @@ spam_words = set()
 # set of legitimate words
 ham_words = set()
 
-for text,label in zip(X_train,y_train):
+for text,label in zip(X_train['sms'],y_train):
     # retrieve the set of words from the message
     stems = stemmer.stem(text)
     # update the list of spam words

@@ -3,17 +3,14 @@ import chardet
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
+import nltk
 
 # This function load the dataset, converts the categorical labels, splits (with stratification) training and testing set and return the two subsets
 # this function will be called by all the other classes that perform classification 
 def get_data():
 
-    # check which is the actual encoding of the .csv file 
-    rawdata = open('dataset/spam.csv', "rb").read()
-    print(chardet.detect(rawdata))
-
     # reading the csv file into a pandas dataframe using the right encoding
-    db = pd.read_csv(r'dataset/spam.csv',encoding='Windows-1252')
+    db = pd.read_csv(r'dataset/spam.csv',encoding="ISO-8859-1")
 
     # convert the categorical labels of v1 (ham,spam) in binary (0,1) labels
     db[['v1']] = db[['v1']].apply(LabelEncoder().fit_transform)
@@ -30,9 +27,31 @@ def get_data():
     db.drop_duplicates(inplace=True)
     print(db.label.value_counts())
 
+    # function that check if currency symbols are present in a string
+    def currency(x):
+        currency_symbols = ['€', '$', '¥', '£', '₹']
+        for i in currency_symbols:
+            if i in x:
+                return 1
+        return 0
+
+    # function that check if numbers are present in a string
+    def numbers(x):
+        for i in x:
+            if ord(i)>=48 and ord(i)<=57:
+                return 1
+        return 0
+
+    # adding some meaningful features to the data: number of chars, number of words, number of presence, currency symble presence
+    db['chars'] = db['sms'].apply(len)
+    db['words'] = db.apply(lambda row: nltk.word_tokenize(row['sms']), axis=1).apply(len)
+    db['sentences'] = db.apply(lambda row: nltk.sent_tokenize(row["sms"]), axis=1).apply(len)
+    db['currency'] = db['sms'].apply(currency)
+    db['numbers']=db['sms'].apply(numbers)
+
     # labels and features raw arrays
     Y = db['label']
-    X = db['sms']
+    X = db.drop(['label'],axis=1)
     
     # split testing and training set (70/30) with stratification on the label
     X_train, X_test, y_train, y_test = train_test_split(X,Y,stratify = Y, test_size = 0.3)

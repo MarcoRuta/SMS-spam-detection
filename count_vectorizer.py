@@ -64,9 +64,9 @@ def classify(train_x, train_y, test_x, test_y):
         plt.legend( loc="lower right" )
         plt.show()
 
-        # saving the trained algorithm in the trained_models directory
-        model = 'trained_models/'+name+'.model'
-        pickle.dump(clf, open(model, 'wb'))
+        if(name == 'Multinomial Naive Bayes' or name == 'SVC'):
+            model = 'trained_models/'+name+'.model'
+            pickle.dump(clf, open(model, 'wb'))
 
 
         t.add_row(
@@ -122,12 +122,9 @@ vectorizer_features = [
 ]
 
 for vectorizer,features in zip(count_vectorizers, vectorizer_features):
-    # transforming the data in a sparse matrix of tokens count
-    training_data = vectorizer.fit_transform(X_train)
-    testing_data = vectorizer.transform(X_test)
-
-    # transformin also the full dataset for k-cross validation
-    full_data = vectorizer.transform(X)
+    # transforming the data sms body in a sparse matrix of tokens count
+    X_train = vectorizer.fit_transform(X_train['sms'])
+    X_test = vectorizer.transform(X_test['sms'])
 
     # saving the trained vectorizer in the trained_models directory
     cv = 'trained_models/vectorizer.pickle'
@@ -135,8 +132,8 @@ for vectorizer,features in zip(count_vectorizers, vectorizer_features):
 
     # classify with 70 % training and 30% testing
     print("\n\n"+"*"*60+"\nResults for vectorizer: "+features+"\n"+"*"*60+"\n\n")
-    classify(training_data,y_train,testing_data,y_test)
+    classify(X_train,y_train,X_test,y_test)
 
-# classify with k-cross fold validation (k = 10)
-full_data = count_vectorizers[-1].transform(X)
-k_fold_cross_validation(full_data,Y,10)
+# validate with k-cross fold validation (k = 10)
+X = count_vectorizers[-1].transform(X['sms'])
+k_fold_cross_validation(X,Y,10)

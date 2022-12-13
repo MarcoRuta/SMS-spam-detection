@@ -29,7 +29,7 @@ def lsh_classify(X_test,y_test,lsh):
     fp = 0
     fn = 0
 
-    for text,label in zip(X_test,y_test):
+    for text,label in zip(X_test['sms'],y_test):
         stems = stemmer.stem(text)
         pred = lsh_predict_label(stems)
         # parsing error
@@ -70,7 +70,7 @@ def lsh_classify(X_test,y_test,lsh):
 spam_messages = []
 
 # grouping up all the spam messages
-for text,label in zip(X_train,y_train):
+for text,label in zip(X_train['sms'],y_train):
     if(label):
         spam_messages.append(text)
 

@@ -5,13 +5,61 @@ from sklearn.feature_extraction.text import CountVectorizer
 from wordcloud import WordCloud, STOPWORDS
 import data_cleaning
 import stemmer
+import seaborn as sns
 
 # retrieving the data needed (cleaned)
 db,X,Y,X_train,X_test,y_train,y_test = data_cleaning.get_data()
 
-def stemmer_test():
+# check of the text conversion algorithm
+def text_conversion_test():
     print(db.sms.values[53])
     print(stemmer.stem(db.sms.values[53])) 
+    cv = CountVectorizer(lowercase=True,stop_words='english',strip_accents='unicode')
+    print(cv.fit_transform(stemmer.stem(db.sms.values[53])))
+
+def features_check(): 
+    # check the correlation between features with an heatmap
+    corrMatrix = db.corr()
+    sns.set( font_scale=1.10 )
+    plt.figure( figsize=(10, 10) )
+    sns.heatmap( corrMatrix, vmax=.8, linewidths=0.01,
+                 square=True, annot=True, cmap='viridis', linecolor="white" )
+
+    plt.title( 'Correlation between features' )
+    plt.tight_layout( pad=4 )
+    plt.show()
+
+    # check the distribution of word lenght for ham/spam messages
+    plt.figure(figsize=(12, 6))
+
+    plt.subplot(1, 2, 1)
+    g = sns.distplot(a=db[db['label']==0].words)
+    p = plt.title('Distribution of words for Ham messages')
+
+    plt.subplot(1, 2, 2)
+    g = sns.distplot(a=db[db['label']==1].words, color='red')
+    p = plt.title('Distribution of words for Spam messages')
+
+    plt.tight_layout()
+    plt.show()
+
+    # check the distribution of currency symbols for ham/spam messages
+
+    plt.figure(figsize=(8,8))
+    g = sns.countplot(x='currency', data=db, hue='label')
+    p = plt.title('Countplot for currency symbols')
+    p = plt.xlabel('0:No, 1:Yes')
+    p = plt.ylabel('Count')
+    p = plt.legend(labels=['Ham', 'Spam'], loc=9)
+    plt.show()
+
+    plt.figure(figsize=(8,8))
+    g = sns.countplot(x='numbers', data=db, hue='label')
+    p = plt.title('Countplot for numbers')
+    p = plt.xlabel('0:No, 1:Yes')
+    p = plt.ylabel('Count')
+    p = plt.legend(labels=['Ham', 'Spam'], loc=9)
+    plt.show()
 
 
 # plotting with histograms which is the distribution of spam/ham messages in the orginal dataset, training test, and testing set
@@ -98,14 +146,14 @@ def print_top_words():
 
     figure, axis = plt.subplots(2)
 
-    common_words = top_n_words(X, 20)
+    common_words = top_n_words(X['sms'], 20)
     df1 = pd.DataFrame(common_words, columns = ['sms_words' , 'count'])
     df1.groupby('sms_words').sum()['count'].sort_values(ascending=False)
     axis[0].bar(x=df1['sms_words'],height=df1['count'])
     axis[0].set_title('Frequency of words in all the sms')
 
 
-    common_words = top_n_words_stopwords(X, 20)
+    common_words = top_n_words_stopwords(X['sms'], 20)
     df1 = pd.DataFrame(common_words, columns = ['sms_words' , 'count'])
     df1.groupby('sms_words').sum()['count'].sort_values(ascending=False)
     axis[1].bar(x=df1['sms_words'],height=df1['count'])
@@ -134,7 +182,8 @@ def print_top_words():
 
 
 if __name__ == '__main__':
-    stemmer_test()
+    features_check()
+    text_conversion_test()
     data_distribution()
     cloud_words()
     cloud_words_stemmed()
