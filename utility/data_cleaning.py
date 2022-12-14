@@ -42,12 +42,20 @@ def get_data():
                 return 1
         return 0
 
-    # adding some meaningful features to the data: number of chars, number of words, number of presence, currency symble presence
+    def links(x):
+        link_strings = ['http','https','www.','.com','.uk']
+        for i in link_strings:
+            if x.find(i) != -1:
+                return 1
+        return 0
+
+    # adding some meaningful features to the data: number of chars, number of words, presence of numbers, links and currency symbols.
     db['chars'] = db['sms'].apply(len)
     db['words'] = db.apply(lambda row: nltk.word_tokenize(row['sms']), axis=1).apply(len)
     db['sentences'] = db.apply(lambda row: nltk.sent_tokenize(row["sms"]), axis=1).apply(len)
     db['currency'] = db['sms'].apply(currency)
     db['numbers']=db['sms'].apply(numbers)
+    db['links']=db['sms'].apply(links)
 
     # labels and features raw arrays
     Y = db['label']
