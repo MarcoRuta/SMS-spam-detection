@@ -28,7 +28,7 @@ def features_check():
     plt.title( 'Correlation between features' )
     plt.tight_layout( pad=4 )
 
-    plt.savefig('images/analysis/correlation_matrix.png', format='png', transparent=True)
+    #plt.savefig('images/analysis/correlation_matrix.png', format='png', transparent=True)
     plt.show()
 
     # check the distribution of word lenght for ham/spam messages
@@ -53,7 +53,7 @@ def features_check():
     p = plt.title('Countplot for currency symbols')
     p = plt.ylabel('Count')
     p = plt.legend(labels=['Ham', 'Spam'], loc=9)
-    plt.savefig('images/analysis/currency_distribution.png', format='png', transparent=True)
+    #plt.savefig('images/analysis/currency_distribution.png', format='png', transparent=True)
     plt.show()
 
     # check the distribution of numbers for ham/spam messages
@@ -62,7 +62,7 @@ def features_check():
     g = sns.countplot(x='numbers', data=db, hue='label')
     p = plt.ylabel('Count')
     p = plt.legend(labels=['Ham', 'Spam'], loc=9)
-    plt.savefig('images/analysis/numbers_distribution.png', format='png', transparent=True)
+    #plt.savefig('images/analysis/numbers_distribution.png', format='png', transparent=True)
     plt.show()
 
     # check the distribution of links for ham/spam messages
@@ -71,7 +71,7 @@ def features_check():
     g = sns.countplot(x='links', data=db, hue='label')
     p = plt.ylabel('Count')
     p = plt.legend(labels=['Ham', 'Spam'], loc=9)
-    plt.savefig('images/analysis/links_distribution.png', format='png', transparent=True)
+    #plt.savefig('images/analysis/links_distribution.png', format='png', transparent=True)
     plt.show()
 
 
@@ -103,7 +103,7 @@ def data_distribution():
         axis[2].set_title("Testing set distribution")
         axis[2].set_xticks(np.arange(0, 2, 1))
 
-        plt.savefig('images/analysis/dataset_distribution.png', format='png', transparent=True)
+        #plt.savefig('images/analysis/dataset_distribution.png', format='png', transparent=True)
 
         plt.show()
 
@@ -139,7 +139,7 @@ def cloud_words_stemmed():
         plt.figure()
         plt.imshow(wordcloud, interpolation="bilinear")
         plt.axis("off")
-        plt.savefig('images/analysis/cleaned_wordcloud.png', format='png', transparent=True)
+        #plt.savefig('images/analysis/cleaned_wordcloud.png', format='png', transparent=True)
         plt.show()
 
 #return the top 20 words with their frequency 
@@ -178,7 +178,7 @@ def print_top_words():
     axis[1].set_title('Frequency of words in all the sms (without stopwords)')
 
     
-    plt.savefig('images/analysis/all_word_freq.png', format='png', transparent=True)
+    #plt.savefig('images/analysis/all_word_freq.png', format='png', transparent=True)
     plt.show()
 
     figure, axis = plt.subplots(2)
@@ -198,7 +198,7 @@ def print_top_words():
     axis[1].bar(x=df1['sms_words'],height=df1['count'],color = 'red')
     axis[1].set_title('Frequency of words in the spam messages (without stopwords)')
 
-    plt.savefig('images/analysis/spam_word_freq.png', format='png', transparent=True)
+    #plt.savefig('images/analysis/spam_word_freq.png', format='png', transparent=True)
     plt.show()
 
 
